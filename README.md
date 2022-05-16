@@ -1,1 +1,1 @@
-#Zola Coin
+# ZolaCoin
