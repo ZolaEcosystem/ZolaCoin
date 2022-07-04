@@ -10,7 +10,7 @@ interface IERC20 {
     function allowance(address owner, address spender)
         external
         view
-        returns (uint256);
+        returns (uint256); 
 
     function transfer(address to, uint256 value) external returns (bool);
 
@@ -417,7 +417,7 @@ contract Zola is ERC20Detailed, Ownable {
     uint8 public constant RATE_DECIMALS = 9;
 
     uint256 private constant INITIAL_FRAGMENTS_SUPPLY =
-        325 * 10**3 * 10**DECIMALS;
+        3e5 * 10**DECIMALS;
 
     uint256 public constant LIQUIDITY_FEE = 30;
     uint256 public constant TREASURY_FEE = 40;
@@ -451,7 +451,7 @@ contract Zola is ERC20Detailed, Ownable {
     uint256 private constant TOTAL_GONS =
         MAX_UINT256 - (MAX_UINT256 % INITIAL_FRAGMENTS_SUPPLY);
 
-    uint256 private constant MAX_SUPPLY = 325 * 10**7 * 10**DECIMALS;
+    uint256 private constant MAX_SUPPLY = 3e9 * 10**DECIMALS;
 
     bool public _autoRebase;
     bool public _autoAddLiquidity;
@@ -505,13 +505,13 @@ contract Zola is ERC20Detailed, Ownable {
         uint256 epoch = times.mul(15);
 
         if (deltaTimeFromInit < (365 days)) {
-            rebaseRate = 2355;
-        } else if (deltaTimeFromInit >= (7 * 365 days)) {
+            rebaseRate = 2365;
+        } else if (deltaTimeFromInit >= (5 * 365 days)) {
             rebaseRate = 2;
-        } else if (deltaTimeFromInit >= ((15 * 365 days) / 10)) {
-            rebaseRate = 14;
+        } else if (deltaTimeFromInit >= (2 * 365 days)) {
+            rebaseRate = 15;
         } else if (deltaTimeFromInit >= (365 days)) {
-            rebaseRate = 211;
+            rebaseRate = 150;
         }
 
         for (uint256 i = 0; i < times; i++) {
