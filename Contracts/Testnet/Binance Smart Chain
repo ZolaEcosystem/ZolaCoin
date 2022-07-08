@@ -420,7 +420,7 @@ contract Zola is ERC20Detailed, Ownable {
         3e5 * 10**DECIMALS;
 
     uint256 public constant LIQUIDITY_FEE = 30;
-    uint256 public constant TREASURY_FEE = 40;
+    uint256 public constant TREASURY_FEE = 30;
     uint256 public constant ZOLA_INSURANCE_FUND_FEE = 50;
     uint256 public constant SELL_FEE = 20;
     uint256 public constant AUTO_BURN_FEE = 20;
@@ -508,7 +508,7 @@ contract Zola is ERC20Detailed, Ownable {
             rebaseRate = 2365;
         } else if (deltaTimeFromInit >= (5 * 365 days)) {
             rebaseRate = 2;
-        } else if (deltaTimeFromInit >= (2 * 365 days)) {
+        } else if (deltaTimeFromInit >= ((15 * 365 days) / 10)) {
             rebaseRate = 15;
         } else if (deltaTimeFromInit >= (365 days)) {
             rebaseRate = 150;
@@ -740,7 +740,7 @@ contract Zola is ERC20Detailed, Ownable {
             _autoAddLiquidity && 
             !inSwap && 
             msg.sender != pair &&
-            block.timestamp >= (_lastAddLiquidityTime + 2 days);
+            block.timestamp >= (_lastAddLiquidityTime + 1 days);
     }
 
     function shouldSwapBack() internal view returns (bool) {
@@ -864,6 +864,10 @@ contract Zola is ERC20Detailed, Ownable {
     
     function setPairAddress(address _pairAddress) external onlyOwner {
         pairAddress = _pairAddress;
+    }
+    
+    function setWhitelist(address _addr) external onlyOwner {
+        _isFeeExempt[_addr] = true;
     }
 
     function setLP(address _address) external onlyOwner {
