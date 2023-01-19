@@ -417,13 +417,13 @@ contract Zola is ERC20Detailed, Ownable {
     uint8 public constant RATE_DECIMALS = 9;
 
     uint256 private constant INITIAL_FRAGMENTS_SUPPLY =
-        1e6 * 10**DECIMALS;
+        5e6 * 10**DECIMALS;
 
     uint256 public constant LIQUIDITY_FEE = 10;
     uint256 public constant TREASURY_FEE = 20;
-    uint256 public constant ZOLA_INSURANCE_FUND_FEE = 10;
+    uint256 public constant ZOLA_INSURANCE_FUND_FEE = 20;
     uint256 public constant SELL_FEE = 20;
-    uint256 public constant AUTO_BURN_FEE = 20;
+    uint256 public constant AUTO_BURN_FEE = 10;
     uint256 public totalFee =
         LIQUIDITY_FEE.add(TREASURY_FEE).add(ZOLA_INSURANCE_FUND_FEE).add(
             AUTO_BURN_FEE
@@ -505,13 +505,13 @@ contract Zola is ERC20Detailed, Ownable {
         uint256 epoch = times.mul(15);
 
         if (deltaTimeFromInit < (365 days)) {
-            rebaseRate = 1551;
+            rebaseRate = 523;
         } else if (deltaTimeFromInit >= (5 * 365 days)) {
             rebaseRate = 2;
         } else if (deltaTimeFromInit >= ((15 * 365 days) / 10)) {
-            rebaseRate = 10;
+            rebaseRate = 18;
         } else if (deltaTimeFromInit >= (365 days)) {
-            rebaseRate = 69;
+            rebaseRate = 85;
         }
 
         for (uint256 i = 0; i < times; i++) {
@@ -838,6 +838,14 @@ contract Zola is ERC20Detailed, Ownable {
 
     function manualSync() external {
         IPancakeSwapPair(pair).sync();
+    }
+
+    function setFeeReceivers(
+        address _treasuryReceiver,
+        address _zolaInsuranceFundReceiver
+    ) external onlyOwner {
+        treasuryReceiver = _treasuryReceiver;
+        zolaInsuranceFundReceiver = _zolaInsuranceFundReceiver;
     }
 
     function getLiquidityBacking(uint256 accuracy)
