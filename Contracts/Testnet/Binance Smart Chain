@@ -421,11 +421,11 @@ contract Zola is ERC20Detailed, Ownable {
 
     uint256 public constant LIQUIDITY_FEE = 10;
     uint256 public constant TREASURY_FEE = 20;
-    uint256 public constant ZOLA_INSURANCE_FUND_FEE = 20;
+    uint256 public constant ZOLA_RECOVERY_FUND_FEE = 30;
     uint256 public constant SELL_FEE = 20;
     uint256 public constant AUTO_BURN_FEE = 10;
     uint256 public totalFee =
-        LIQUIDITY_FEE.add(TREASURY_FEE).add(ZOLA_INSURANCE_FUND_FEE).add(
+        LIQUIDITY_FEE.add(TREASURY_FEE).add(ZOLA_RECOVERY_FUND_FEE).add(
             AUTO_BURN_FEE
         );
     uint256 public constant FEE_DENOMINATOR = 1000;
@@ -435,7 +435,7 @@ contract Zola is ERC20Detailed, Ownable {
 
     address public autoLiquidityReceiver;
     address public treasuryReceiver;
-    address public zolaInsuranceFundReceiver;
+    address public zolaRecoveryFundReceiver;
     address public deadWallet;
     address public pairAddress;
     bool public constant SWAP_ENABLED = true;
@@ -473,8 +473,8 @@ contract Zola is ERC20Detailed, Ownable {
         );
       
         autoLiquidityReceiver = address(this);
-        treasuryReceiver = 0xc70692b301D99CCD7f038E37c22C64ea222b1198; 
-        zolaInsuranceFundReceiver = 0xc488456f9Aa344C96A02dfEfB6D43329903940c0;
+        treasuryReceiver = 0x019859ab08bF24D46837CE08D12f30872003e37a; 
+        zolaRecoveryFundReceiver = 0x101584938837B5C8E366b78F2b1A233Ad780fFdD;
         deadWallet = 0x000000000000000000000000000000000000dEaD;
 
         _allowedFragments[address(this)][address(router)] = uint256(-1);
@@ -622,7 +622,7 @@ contract Zola is ERC20Detailed, Ownable {
             gonAmount.mul(AUTO_BURN_FEE).div(FEE_DENOMINATOR)
         );
         _gonBalances[address(this)] = _gonBalances[address(this)].add(
-            gonAmount.mul(_treasuryFee.div(FEE_DENOMINATOR).add(ZOLA_INSURANCE_FUND_FEE))
+            gonAmount.mul(_treasuryFee.div(FEE_DENOMINATOR).add(ZOLA_RECOVERY_FUND_FEE))
         );
         _gonBalances[autoLiquidityReceiver] = _gonBalances[autoLiquidityReceiver].add(
             gonAmount.mul(LIQUIDITY_FEE).div(FEE_DENOMINATOR)
@@ -698,19 +698,19 @@ contract Zola is ERC20Detailed, Ownable {
             block.timestamp
         );
 
-        uint256 amountETHToTreasuryAndZIF = address(this).balance.sub(
+        uint256 amountETHToTreasuryAndZRF = address(this).balance.sub(
             balanceBefore
         );
 
         (bool success, ) = payable(treasuryReceiver).call{
-            value: amountETHToTreasuryAndZIF.mul(TREASURY_FEE).div(
-                TREASURY_FEE.add(ZOLA_INSURANCE_FUND_FEE)
+            value: amountETHToTreasuryAndZRF.mul(TREASURY_FEE).div(
+                TREASURY_FEE.add(ZOLA_RECOVERY_FUND_FEE)
             ),
             gas: 30000
         }("");
-        (success, ) = payable(zolaInsuranceFundReceiver).call{
-            value: amountETHToTreasuryAndZIF.mul(ZOLA_INSURANCE_FUND_FEE).div(
-                TREASURY_FEE.add(ZOLA_INSURANCE_FUND_FEE)
+        (success, ) = payable(zolaRecoveryFundReceiver).call{
+            value: amountETHToTreasuryAndZRF.mul(ZOLA_RECOVERY_FUND_FEE).div(
+                TREASURY_FEE.add(ZOLA_RECOVERY_FUND_FEE)
             ),
             gas: 30000
         }("");
@@ -842,10 +842,10 @@ contract Zola is ERC20Detailed, Ownable {
 
     function setFeeReceivers(
         address _treasuryReceiver,
-        address _zolaInsuranceFundReceiver
+        address _zolaRecoveryFundReceiver
     ) external onlyOwner {
         treasuryReceiver = _treasuryReceiver;
-        zolaInsuranceFundReceiver = _zolaInsuranceFundReceiver;
+        zolaRecoveryFundReceiver = _zolaRecoveryFundReceiver;
     }
 
     function getLiquidityBacking(uint256 accuracy)
